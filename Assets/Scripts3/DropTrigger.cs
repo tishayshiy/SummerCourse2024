@@ -1,22 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
-public class DropTrigger : MonoBehaviour
+public class MoveToCollisionPoint : MonoBehaviour
 {
-    // Префаб, который будет спавниться
-    public GameObject prefabToSpawn;
+    // Ссылка на Nav Mesh Agent
+    public NavMeshAgent agent;
 
-    // Время, через которое объект будет удален
-    public float deleteDelay = 2f;
+    // Список объектов с Rigidbody
+    public GameObject[] rigidbodyObjects;
 
-    // Вызывается при столкновении с другим объектом
-    private void OnCollisionEnter(Collision collision)
+    // Точка, куда должен двигаться агент
+    public static Vector3 targetPosition;
+
+    // Метод, вызываемый при входе коллайдера в триггер
+    private void OnTriggerEnter(Collider other)
     {
-        // Создаем новый объект в точке столкновения
-        GameObject spawnedObject = Instantiate(prefabToSpawn, collision.contacts[0].point, Quaternion.identity);
-
-        // Удаляем объект через определенное время
-        Destroy(spawnedObject, deleteDelay);
+        // Проверяем, является ли коллайдер частью объекта с Rigidbody
+        foreach (GameObject obj in rigidbodyObjects)
+        {
+            if (other.gameObject == obj)
+            {
+                // Задаем новую точку назначения для агента
+                targetPosition = other.ClosestPointOnBounds(transform.position);
+                agent.SetDestination(targetPosition);
+                break;
+            }
+        }
     }
 }
