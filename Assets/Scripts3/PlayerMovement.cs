@@ -24,30 +24,27 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (stamina < 100 && !isRunning && Time.time - lastStaminaZeroTime > 5f)
-        {
+        if (stamina < 100 && stamina > 0 && isRunning == false){ 
             stamina += staminaRegenRate * Time.deltaTime;
         }
 
-        if (stamina < 0)
-        {
+        else if (stamina < 0 && Time.time - lastStaminaZeroTime > 5f){
             isRunning = false;
             lastStaminaZeroTime = Time.time;
-            stamina = 0;
+            stamina = 0.1f;
         }
 
         Vector3 forwardDirection = yRight * rigidbody.transform.forward * Input.GetAxis("Horizontal");
         Vector3 rightDirection = yForward * rigidbody.transform.right * Input.GetAxis("Vertical");
 
-        if (Input.GetKey(KeyCode.LeftShift) && stamina > 0)
-        {
-            rigidbody.velocity = (forwardDirection + rightDirection) * runSpeed;
+        if (Input.GetKey(KeyCode.LeftShift) && stamina > 0){
+            rigidbody.AddForce((forwardDirection + rightDirection) * runSpeed, ForceMode.VelocityChange);
             isRunning = true;
             stamina -= 20 * Time.deltaTime;
         }
-        else
-        {
-            rigidbody.velocity = (forwardDirection + rightDirection) * speed;
+        else{
+            rigidbody.AddForce((forwardDirection + rightDirection) * speed, ForceMode.VelocityChange);
+            isRunning = false;
         }
     }
 }
